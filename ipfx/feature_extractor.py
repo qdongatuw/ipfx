@@ -36,11 +36,11 @@
 import numpy as np
 from pandas import DataFrame
 
-from . import spike_features as spkf
-from . import subthresh_features as subf
-from . import spike_detector as spkd
-from . import spike_train_features as strf
-from . import time_series_utils as tsu
+import spike_features as spkf
+import subthresh_features as subf
+import spike_detector as spkd
+import spike_train_features as strf
+import time_series_utils as tsu
 
 
 class SpikeFeatureExtractor(object):

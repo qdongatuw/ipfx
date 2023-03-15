@@ -37,9 +37,9 @@ import logging
 import numpy as np
 from scipy.optimize import curve_fit
 from functools import partial
-from . import time_series_utils as tsu
-from . import spike_detector as spkd
-from . import error as er
+import time_series_utils as tsu
+import spike_detector as spkd
+import error as er
 
 def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes, clipped=None):
     """Find widths at half-height for spikes.

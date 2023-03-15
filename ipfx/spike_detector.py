@@ -1,7 +1,7 @@
 import numpy as np
 import logging
-from . import time_series_utils as tsu
-from . import error as er
+import time_series_utils as tsu
+import error as er
 
 def detect_putative_spikes(v, t, start=None, end=None, filter=10., dv_cutoff=20., dvdt=None):
     """Perform initial detection of spikes and return their indexes.

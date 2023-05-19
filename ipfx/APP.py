@@ -12,7 +12,7 @@ files = filedialog.askopenfilenames(filetypes=filetypes)
 sfe = SpikeFeatureExtractor(filter=2)
 spte = SpikeTrainFeatureExtractor(start=0, end=16000)
 
-out_folder = r'C:\Users\dongq\OneDrive\mouse patch-seq\result\'
+out_folder = r'C:\Users\dongq\OneDrive\mouse patch-seq\result'
 
 name_list = [os.path.basename(i) for i in files]
 df = pd.DataFrame({'File': name_list})
@@ -21,7 +21,7 @@ for file in files:
     f = pyabf.ABF(file)
 
     if f.nOperationMode == 5:   # multi-sweeps
-        folder = out_folder + f.abfID
+        folder = out_folder + '\\' + f.abfID
         if not os.path.exists(folder):
             os.mkdir(folder)
 

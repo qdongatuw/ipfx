@@ -39,6 +39,16 @@ for file in files:
             sag = []
             vol_deflection = []
 
+            f.setSweep(0)
+            first_epoc = f.sweepEpochs
+            f.setSweep(1)
+            second_epoc = f.sweepEpochs
+            dif = np.asarray(second_epoc.levels) - np.asarray(first_epoc.levels)
+
+            step = dif != 0
+            start = np.asarray(first_epoc.p1s)[step][0]
+            end = np.asarray(first_epoc.p2s)[step][0]
+
             for index in f.sweepList:
                 f.setSweep(index)
                 t = f.sweepX
@@ -50,7 +60,7 @@ for file in files:
                 ft = sfe.process(t, v, i)
                 ft.to_csv(f'{folder}/{index}.csv', index=False)
                 sptft= spte.process(t=t, v=v, i=i, spikes_df=ft)
-                current = f.sweepEpochs.levels[-2]
+                current = f.sweepEpochs.levels[step][0]
                 sptft['injected current (pA)'] = current
                 temp_result_list.append((ft, sptft))
             

@@ -60,7 +60,7 @@ for file in files:
                 ft = sfe.process(t, v, i)
                 ft.to_csv(f'{folder}/{index}.csv', index=False)
                 sptft= spte.process(t=t, v=v, i=i, spikes_df=ft)
-                current = f.sweepEpochs.levels[step][0]
+                current = np.asarray(f.sweepEpochs.levels)[step][0]
                 sptft['injected current (pA)'] = current
                 temp_result_list.append((ft, sptft))
             

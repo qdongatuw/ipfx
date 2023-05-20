@@ -11,7 +11,7 @@ def basic_spike_train_features(t, spikes_df, start, end, exclude_clipped=False):
         features["avg_rate"] = 0
         return features
 
-    thresholds = spikes_df["threshold_index"].values.astype(int)
+    thresholds = spikes_df["threshold_t"].values.astype(int)
     if exclude_clipped:
         mask = spikes_df["clipped"].values.astype(bool)
         thresholds = thresholds[~mask]
@@ -184,7 +184,7 @@ def average_rate(t, spikes, start, end):
 
     if end is None:
         end = t[-1]
-
+    
     spikes_in_interval = [spk for spk in spikes if t[spk] >= start and t[spk] <= end]
     avg_rate = len(spikes_in_interval) / (end - start)
     return avg_rate

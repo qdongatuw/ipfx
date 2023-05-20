@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pyabf
 from feature_extractor import SpikeFeatureExtractor, SpikeTrainFeatureExtractor
+import subthresh_features as sbth
 
 
 filetypes = [('ABF Files', '*.abf')]
@@ -32,12 +33,18 @@ for file in files:
             sampling_rate = f.sampleRate
             temp_result_list = []
 
+            rmp = []
+            rin = []
+            tau = []
+            sag = []
+            vol_deflection = []
+
             for index in f.sweepList:
                 f.setSweep(index)
                 t = f.sweepX
                 v = f.sweepY
                 i = f.sweepC
-
+                
                 if f.sweepUnitsY == f.sweepUnitsC:
                     v = v/20
                 ft = sfe.process(t, v, i)

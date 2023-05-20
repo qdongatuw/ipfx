@@ -10,8 +10,6 @@ import subthresh_features as sbth
 filetypes = [('ABF Files', '*.abf')]
 files = filedialog.askopenfilenames(filetypes=filetypes)
 
-sfe = SpikeFeatureExtractor(filter=2)
-spte = SpikeTrainFeatureExtractor(start=0, end=16000)
 
 out_folder = r'C:\Users\dongq\OneDrive\mouse patch-seq\result'
 out_csv = r'C:\Users\dongq\OneDrive\mouse patch-seq\result\test.csv'
@@ -48,6 +46,9 @@ for file in files:
             step = dif != 0
             start = np.asarray(first_epoc.p1s)[step][0]
             end = np.asarray(first_epoc.p2s)[step][0]
+
+            sfe = SpikeFeatureExtractor(filter=2)
+            spte = SpikeTrainFeatureExtractor(start=start/sampling_rate, end=end/sampling_rate)
 
             for index in f.sweepList:
                 f.setSweep(index)
@@ -90,7 +91,7 @@ for file in files:
             firing_rate_list['sampling rate'] = [sampling_rate]
             for i_result in temp_result_list:
                 current = i_result[1]['injected current (pA)']
-                rate = i_result[1]['avg_rate'] * sampling_rate
+                rate = i_result[1]['avg_rate']
                 firing_rate_list[f'{current} pA'] = [rate]
             rate_df = pd.DataFrame(firing_rate_list)
             temp_df2 = pd.merge(temp_df1, rate_df, on='File')

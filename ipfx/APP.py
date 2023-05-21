@@ -25,6 +25,16 @@ for file in files:
         folder = out_folder + '\\' + f.abfID
         if not os.path.exists(folder):
             os.mkdir(folder)
+        
+        f.setSweep(0)
+        first_epoc = f.sweepEpochs
+        f.setSweep(1)
+        second_epoc = f.sweepEpochs
+        dif = np.asarray(second_epoc.levels) - np.asarray(first_epoc.levels)
+
+        step = dif != 0
+        start = np.asarray(first_epoc.p1s)[step][0]
+        end = np.asarray(first_epoc.p2s)[step][0]
 
         if f.sweepUnitsC == 'pA':   # current clamp
 
@@ -32,20 +42,12 @@ for file in files:
             temp_result_list = []
 
             rmp = []
-            rin = []
             tau = []
             sag = []
-            vol_deflection = []
 
-            f.setSweep(0)
-            first_epoc = f.sweepEpochs
-            f.setSweep(1)
-            second_epoc = f.sweepEpochs
-            dif = np.asarray(second_epoc.levels) - np.asarray(first_epoc.levels)
-
-            step = dif != 0
-            start = np.asarray(first_epoc.p1s)[step][0]
-            end = np.asarray(first_epoc.p2s)[step][0]
+            t_set = []
+            i_set = []
+            v_set = []
 
             sfe = SpikeFeatureExtractor(filter=2)
             spte = SpikeTrainFeatureExtractor(start=start/sampling_rate, end=end/sampling_rate)
@@ -58,13 +60,31 @@ for file in files:
                 
                 if f.sweepUnitsY == f.sweepUnitsC:
                     v = v/20
+                
+                current = np.asarray(f.sweepEpochs.levels)[step][0]
+
+                rmp.append(np.median(v[np.where(i == 0)]))
+                if current < 0:
+                    tau.append(sbth.time_constant(t=t, v=v, i=i, start=start/sampling_rate, end=(end-2)/sampling_rate))
+                    sag.append(sbth.sag(t=t, v=v, i=i, start=start/sampling_rate, end=end/sampling_rate))
+                    t_set.append(t)
+                    i_set.append(i)
+                    v_set.append(v)
+
+                if current == 0:
+                    t_set.append(t)
+                    i_set.append(i)
+                    v_set.append(v)
+
                 ft = sfe.process(t, v, i)
                 ft.to_csv(f'{folder}/{index}.csv', index=False)
                 sptft= spte.process(t=t, v=v, i=i, spikes_df=ft)
-                current = np.asarray(f.sweepEpochs.levels)[step][0]
                 sptft['injected current (pA)'] = current
                 temp_result_list.append((ft, sptft))
-            
+
+            rin = sbth.input_resistance(t_set=t_set, i_set=i_set, v_set=v_set, start=start/sampling_rate, end=end/sampling_rate)
+
+
             with open(f'{folder}/result.txt', mode='w', encoding='utf-8') as result_txt_file:
                 for i_result in temp_result_list:
                     result_txt_file.write(str(i_result[1]))
@@ -95,6 +115,9 @@ for file in files:
                 firing_rate_list[f'{current} pA'] = [rate]
             rate_df = pd.DataFrame(firing_rate_list)
             temp_df2 = pd.merge(temp_df1, rate_df, on='File')
+
+            
+
             df = pd.concat([df, temp_df2])
 df.to_csv(out_csv, index=False)
 

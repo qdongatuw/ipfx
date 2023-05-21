@@ -1,5 +1,5 @@
 import numpy as np
-import ipfx.time_series_utils as tsu
+import time_series_utils as tsu
 
 
 # global constants

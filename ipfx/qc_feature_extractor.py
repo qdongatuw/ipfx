@@ -1,9 +1,9 @@
-from . import stim_features as stf
-from . import epochs as ep
-from . import error as er
+import stim_features as stf
+import epochs as ep
+import error as er
 import logging
 import numpy as np
-from . import qc_features as qcf
+import qc_features as qcf
 
 
 def extract_blowout(data_set, tags):

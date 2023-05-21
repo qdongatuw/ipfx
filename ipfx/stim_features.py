@@ -1,5 +1,5 @@
 import numpy as np
-from . import time_series_utils as tsu
+import time_series_utils as tsu
 
 
 def get_stim_characteristics(i, t, test_pulse=True):

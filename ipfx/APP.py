@@ -116,7 +116,13 @@ for file in files:
             rate_df = pd.DataFrame(firing_rate_list)
             temp_df2 = pd.merge(temp_df1, rate_df, on='File')
 
+            sub_df = pd.DataFrame({'File': [file_name], 
+                                   'RMP': [np.mean(rmp)],
+                                   'time constant (sec)': [np.mean(tau)], 
+                                   'input resistance (Mo)': [rin],
+                                   'sag ratio': [np.mean(sag)]})
             
+            temp_df2
 
             df = pd.concat([df, temp_df2])
 df.to_csv(out_csv, index=False)

@@ -51,8 +51,7 @@ for index in f.sweepList:
 
     rmp.append(np.median(v[np.where(i == 0)]))
     if current < 0:
-        print(start/sampling_rate, (end-2)/sampling_rate)
-        baseline_interval = min(start-0.01, 0.1)
+        baseline_interval = min(start/(sampling_rate*2), 0.1)
         tau.append(sbth.time_constant(t=t, v=v, i=i, start=start/sampling_rate, end=(end-2)/sampling_rate, baseline_interval=baseline_interval))
         sag.append(sbth.sag(t=t, v=v, i=i, start=start/sampling_rate, end=end/sampling_rate, baseline_interval=baseline_interval))
         t_set.append(t)

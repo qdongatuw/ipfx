@@ -65,52 +65,43 @@ def get_r_from_stable_pulse_response(v, i, t):
     dt = t[1] - t[0]
     one_ms = int(0.001 / dt)
 
-    r = []
-    for ii in range(len(up_idx)):
-        # take average v and i one ms before start
-        end = up_idx[ii] - 1
-        start = end - one_ms
+    # take average v and i one ms before start
+    end = up_idx - 1
+    start = end - one_ms
 
-        avg_v_base = np.mean(v[start:end])
-        avg_i_base = np.mean(i[start:end])
+    avg_v_base = np.mean(v[start:end])
+    avg_i_base = np.mean(i[start:end])
 
-        # take average v and i one ms before end
-        end = down_idx[ii]-1
-        start = end - one_ms
+    # take average v and i one ms before end
+    end = down_idx-1
+    start = end - one_ms
 
-        avg_v_steady = np.mean(v[start:end])
-        avg_i_steady = np.mean(i[start:end])
+    avg_v_steady = np.mean(v[start:end])
+    avg_i_steady = np.mean(i[start:end])
 
-        r_instance = (avg_v_steady-avg_v_base) / (avg_i_steady-avg_i_base)
-
-        r.append(r_instance)
-
-    return np.mean(r)
+    return (avg_v_steady-avg_v_base) / (avg_i_steady-avg_i_base)
+    
 
 
 def get_r_from_peak_pulse_response(v, i, t):
 
     up_idx, down_idx = get_square_pulse_idx(v)
-
     dt = t[1] - t[0]
     one_ms = int(0.001 / dt)
-    r = []
-    for ii in range(len(up_idx)):
-        # take average v and i one ms before
-        end = up_idx[ii] - 1
-        start = end - one_ms
-        avg_v_base = np.mean(v[start:end])
-        avg_i_base = np.mean(i[start:end])
-        # take average v and i one ms before end
-        start = up_idx[ii]
-        end = down_idx[ii] - 1
-        idx = start + np.argmax(i[start:end])
-        avg_v_peak = v[idx]
-        avg_i_peak = i[idx]
-        r_instance = (avg_v_peak-avg_v_base) / (avg_i_peak-avg_i_base)
-        r.append(r_instance)
-
-    return np.mean(r)
+    
+    # take average v and i one ms before
+    end = up_idx - 1
+    start = end - one_ms
+    avg_v_base = np.mean(v[start:end])
+    avg_i_base = np.mean(i[start:end])
+    # take average v and i one ms before end
+    start = up_idx
+    end = down_idx - 1
+    idx = start + np.argmin(i[start:end])
+    avg_v_peak = v[idx]
+    avg_i_peak = i[idx]
+    r_instance = (avg_v_peak-avg_v_base) / (avg_i_peak-avg_i_base)
+    return r_instance
 
 
 def get_square_pulse_idx(v):
@@ -130,12 +121,6 @@ def get_square_pulse_idx(v):
     """
     dv = np.diff(v)
 
-    up_idx = np.flatnonzero(dv > 0)[1:] # skip the very first pulse (test pulse)
-    down_idx = np.flatnonzero(dv < 0)[1:]
-
-    assert len(up_idx) == len(down_idx), "Truncated square pulse"
-
-    for up_ix, down_ix in zip(up_idx, down_idx):
-        assert up_ix < down_ix, "Negative square pulse"
+    up_idx,  down_idx = np.flatnonzero(dv)
 
     return up_idx, down_idx

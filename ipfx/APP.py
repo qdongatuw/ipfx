@@ -1,10 +1,13 @@
 import os
+from datetime import datetime
 from tkinter import filedialog
 import numpy as np
 import pandas as pd
 import pyabf
 from feature_extractor import SpikeFeatureExtractor, SpikeTrainFeatureExtractor
 import subthresh_features as sbth
+import qc_features as qc
+
 
 
 filetypes = [('ABF Files', '*.abf')]
@@ -12,7 +15,7 @@ files = filedialog.askopenfilenames(filetypes=filetypes)
 
 
 out_folder = r'C:\Users\dongq\OneDrive\mouse patch-seq\result'
-out_csv = r'C:\Users\dongq\OneDrive\mouse patch-seq\result\test.csv'
+out_csv = fr'C:\Users\dongq\OneDrive\mouse patch-seq\result\{datetime.now().strftime("%Y-%m-%d-%H-%M")}.csv'
 
 name_list = [os.path.basename(i) for i in files]
 df = pd.DataFrame()
@@ -126,9 +129,34 @@ for file in files:
 
             df = pd.concat([df, temp_df3])
 
-            
+
         if f.sweepUnitsC == 'mV':
-            pass
+            # QC
+            rin_v = []
+            r_access = []
+
+            ina = dict()
+
+            for index in f.sweepList:
+                f.setSweep(index)
+                v, t, i = f.sweepC[:start-1], f.sweepX[:start-1], f.sweepY[:start-1]
+                holding_current = np.median(i[np.where(v == f.sweepEpochs.levels[0])])
+                rin_v.append(qc.measure_input_resistance(v, i, t))
+                r_access.append(qc.measure_initial_access_resistance(v, i, t))
+
+                v_step = np.asarray(f.sweepEpochs.levels)[step][0]
+                i_peak = np.min(f.sweepY[start:end]) - holding_current
+
+                
+                ina[f'{v_step} mV'] = i_peak
+            qc_df = pd.DataFrame({'File': [file_name],
+                                  'Input Resistance(v_clamp)': [np.mean(rin_v)],
+                                  'Access resistance': [np.mean(r_access)]})
+            for i in ina:
+                qc_df[i] = [ina[i]]
+            df = pd.concat([df, qc_df])
+
+
 
 df.to_csv(out_csv, index=False)
 

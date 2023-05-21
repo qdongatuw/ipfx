@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import tkinter as tk
 from tkinter import filedialog
 import numpy as np
 import pandas as pd
@@ -9,18 +10,30 @@ import subthresh_features as sbth
 import qc_features as qc
 
 
+root = tk.Tk()
+root.withdraw()
 
-filetypes = [('ABF Files', '*.abf')]
-files = filedialog.askopenfilenames(filetypes=filetypes)
+selected_folder = filedialog.askdirectory()
+
+file_paths = []
+
+for root_dir, dirs, files in os.walk(selected_folder):
+    for file in files:
+        if file.lower().endswith('.abf'):
+            file_paths.append(os.path.join(root_dir, file))
+
+print(len(file_paths))
+
+# filetypes = [('ABF Files', '*.abf')]
+# files = filedialog.askopenfilenames(filetypes=filetypes)
 
 
 out_folder = r'C:\Users\dongq\OneDrive\mouse patch-seq\result'
 out_csv = fr'C:\Users\dongq\OneDrive\mouse patch-seq\result\{datetime.now().strftime("%Y-%m-%d-%H-%M")}.csv'
 
-name_list = [os.path.basename(i) for i in files]
 df = pd.DataFrame()
 
-for file in files:
+for file in file_paths:
     file_name = os.path.basename(file)
     print(file_name)
     f = pyabf.ABF(file)

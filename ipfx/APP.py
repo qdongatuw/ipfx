@@ -122,9 +122,14 @@ for file in files:
                                    'input resistance (Mo)': [rin],
                                    'sag ratio': [np.mean(sag)]})
             
-            temp_df2
+            temp_df3 = pd.merge(temp_df2, sub_df, on='File')
 
-            df = pd.concat([df, temp_df2])
+            df = pd.concat([df, temp_df3])
+
+            
+        if f.sweepUnitsC == 'mV':
+            pass
+
 df.to_csv(out_csv, index=False)
 
             

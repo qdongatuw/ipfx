@@ -39,9 +39,9 @@ for file in file_paths:
     f = pyabf.ABF(file)
 
     if f.nOperationMode == 5 and f.sweepCount > 3:   # multi-sweeps
-        folder = out_folder + '\\' + f.abfID
-        if not os.path.exists(folder):
-            os.mkdir(folder)
+        # folder = out_folder + '\\' + f.abfID
+        # if not os.path.exists(folder):
+        #     os.mkdir(folder)
         
         f.setSweep(0)
         first_epoc = f.sweepEpochs
@@ -95,7 +95,7 @@ for file in file_paths:
                     v_set.append(v)
 
                 ft = sfe.process(t, v, i)
-                ft.to_csv(f'{folder}/{index}.csv', index=False)
+                # ft.to_csv(f'{folder}/{index}.csv', index=False)
                 sptft= spte.process(t=t, v=v, i=i, spikes_df=ft)
                 sptft['injected current (pA)'] = current
                 temp_result_list.append((ft, sptft))
@@ -103,10 +103,10 @@ for file in file_paths:
             rin = sbth.input_resistance(t_set=t_set, i_set=i_set, v_set=v_set, start=start/sampling_rate, end=end/sampling_rate)
 
 
-            with open(f'{folder}/result.txt', mode='w', encoding='utf-8') as result_txt_file:
-                for i_result in temp_result_list:
-                    result_txt_file.write(str(i_result[1]))
-                    result_txt_file.write('\n')
+            # with open(f'{folder}/result.txt', mode='w', encoding='utf-8') as result_txt_file:
+            #     for i_result in temp_result_list:
+            #         result_txt_file.write(str(i_result[1]))
+            #         result_txt_file.write('\n')
 
             for i_result in temp_result_list:
                 if i_result[1]['avg_rate'] > 0:
